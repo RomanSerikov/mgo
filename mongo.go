@@ -105,8 +105,8 @@ func (db *DB) DeleteItem(collection string, filter bson.D) error {
 	return err
 }
 
-// DeleteAll the items in collection
-func (db *DB) DeleteAll(collection string, filter bson.D) error {
+// DeleteItems the items in collection
+func (db *DB) DeleteItems(collection string, filter bson.D) error {
 	ctx := context.Background()
 	c := db.Database(db.name).Collection(collection)
 	_, err := c.DeleteMany(ctx, filter)
@@ -115,7 +115,7 @@ func (db *DB) DeleteAll(collection string, filter bson.D) error {
 
 // ReplaceOne - clear all collection and insert one item in it
 func (db *DB) ReplaceOne(collection string, data interface{}) error {
-	if err := db.DeleteAll(collection, bson.D{}); err != nil {
+	if err := db.DeleteItems(collection, bson.D{}); err != nil {
 		return err
 	}
 
@@ -131,7 +131,7 @@ func (db *DB) ReplaceAll(collection string, data []interface{}) error {
 		return nil
 	}
 
-	if err := db.DeleteAll(collection, bson.D{}); err != nil {
+	if err := db.DeleteItems(collection, bson.D{}); err != nil {
 		return err
 	}
 
