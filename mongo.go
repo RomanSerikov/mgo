@@ -3,10 +3,8 @@ package mgo
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
-	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -150,10 +148,8 @@ func (db *DB) CreateIndex(collection string, keys bson.M) error {
 
 	c := db.Database(db.name).Collection(collection)
 	if _, err := c.Indexes().CreateOne(context.Background(), mod); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("collection.Indexes().CreateOne %s", collection))
+		return fmt.Errorf("error: collection.Indexes().CreateOne %s", collection)
 	}
-
-	log.Printf("index in collection %v for field %v created successfully.\n", collection, keys)
 
 	return nil
 }
@@ -167,11 +163,10 @@ func (db *DB) CreateIndices(collections []string, keys bson.M) error {
 
 	for _, column := range collections {
 		collection := db.Database(db.name).Collection(column)
-		if _, err := collection.Indexes().CreateOne(context.Background(), mod); err != nil {
-			return errors.Wrap(err, fmt.Sprintf("collection.Indexes().CreateOne %s", column))
-		}
 
-		log.Printf("index in collection %v for field address created successfully.\n", column)
+		if _, err := collection.Indexes().CreateOne(context.Background(), mod); err != nil {
+			return fmt.Errorf("collection.Indexes().CreateOne %s", column)
+		}
 	}
 
 	return nil
