@@ -84,6 +84,14 @@ func (db *DB) UpdateItem(collection string, filter bson.D, item interface{}) err
 	return err
 }
 
+// UpdateItems in collection
+func (db *DB) UpdateItems(collection string, filter bson.D, item interface{}) error {
+	ctx := context.Background()
+	c := db.Database(db.name).Collection(collection)
+	_, err := c.UpdateMany(ctx, filter, item)
+	return err
+}
+
 // UpsertItem in collection. Create if not exist, update otherwise
 func (db *DB) UpsertItem(collection string, filter bson.D, item interface{}) error {
 	ctx := context.Background()
