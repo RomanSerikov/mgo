@@ -147,6 +147,14 @@ func (db *DB) ReplaceAll(collection string, data []interface{}) error {
 	return nil
 }
 
+// BulkWrite - bulk writes items
+func (db *DB) BulkWrite(collection string, data []mongo.WriteModel) error {
+	ctx := context.Background()
+	c := db.Database(db.name).Collection(collection)
+	_, err := c.BulkWrite(ctx, data)
+	return err
+}
+
 // CreateIndex for collection
 func (db *DB) CreateIndex(collection, field string) error {
 	return db.CreateIndices(map[string]string{collection: field})
