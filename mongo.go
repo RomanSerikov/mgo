@@ -148,32 +148,22 @@ func (db *DB) ReplaceAll(collection string, data []interface{}) error {
 }
 
 // CreateIndex for collection
-func (db *DB) CreateIndex(collection string, keys bson.M) error {
-	mod := mongo.IndexModel{
-		Keys:    keys,
-		Options: options.Index().SetUnique(true),
-	}
-
-	c := db.Database(db.name).Collection(collection)
-	if _, err := c.Indexes().CreateOne(context.Background(), mod); err != nil {
-		return fmt.Errorf("error: collection.Indexes().CreateOne %s", collection)
-	}
-
-	return nil
+func (db *DB) CreateIndex(collection, field string) error {
+	return db.CreateIndices(map[string]string{collection: field})
 }
 
 // CreateIndices for collections
-func (db *DB) CreateIndices(collections []string, keys bson.M) error {
-	mod := mongo.IndexModel{
-		Keys:    keys,
-		Options: options.Index().SetUnique(true),
-	}
+func (db *DB) CreateIndices(indexes map[string]string) error {
+	for collection, field := range indexes {
+		mod := mongo.IndexModel{
+			Keys:    bson.M{field: 1},
+			Options: options.Index().SetUnique(true),
+		}
 
-	for _, column := range collections {
-		collection := db.Database(db.name).Collection(column)
+		c := db.Database(db.name).Collection(collection)
 
-		if _, err := collection.Indexes().CreateOne(context.Background(), mod); err != nil {
-			return fmt.Errorf("collection.Indexes().CreateOne %s", column)
+		if _, err := c.Indexes().CreateOne(context.Background(), mod); err != nil {
+			return fmt.Errorf("c.Indexes().CreateOne %s %s", collection, field)
 		}
 	}
 
