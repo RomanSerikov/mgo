@@ -148,10 +148,12 @@ func (db *DB) ReplaceAll(collection string, data []interface{}) error {
 }
 
 // BulkWrite - bulk writes items
-func (db *DB) BulkWrite(collection string, data []mongo.WriteModel) error {
+func (db *DB) BulkWrite(collection string, data []mongo.WriteModel, stopAfterFail bool) error {
 	ctx := context.Background()
+	opts := options.BulkWrite()
+	opts.SetOrdered(stopAfterFail)
 	c := db.Database(db.name).Collection(collection)
-	_, err := c.BulkWrite(ctx, data)
+	_, err := c.BulkWrite(ctx, data, opts)
 	return err
 }
 
