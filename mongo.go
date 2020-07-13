@@ -17,6 +17,14 @@ type DB struct {
 	name string
 }
 
+// Index -
+type Index struct {
+	Collection string
+	Field      string
+	Unique     bool
+	Sparce     bool
+}
+
 // NewDatabase creates DB struct with URI and database name
 func NewDatabase(uri, name string) (*DB, error) {
 	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
@@ -157,22 +165,22 @@ func (db *DB) BulkWrite(collection string, data []mongo.WriteModel, stopAfterFai
 }
 
 // CreateIndex for collection
-func (db *DB) CreateIndex(collection, field string, unique bool) error {
-	return db.CreateIndices(map[string]string{collection: field}, unique)
+func (db *DB) CreateIndex(index Index) error {
+	return db.CreateIndices([]Index{index})
 }
 
 // CreateIndices for collections
-func (db *DB) CreateIndices(indexes map[string]string, unique bool) error {
-	for collection, field := range indexes {
+func (db *DB) CreateIndices(indexes []Index) error {
+	for _, index := range indexes {
 		mod := mongo.IndexModel{
-			Keys:    bson.M{field: 1},
-			Options: options.Index().SetUnique(unique),
+			Keys:    bson.M{index.Field: 1},
+			Options: options.Index().SetUnique(index.Unique).SetSparse(index.Sparce),
 		}
 
-		c := db.Database(db.name).Collection(collection)
+		c := db.Database(db.name).Collection(index.Collection)
 
 		if _, err := c.Indexes().CreateOne(context.Background(), mod); err != nil {
-			return fmt.Errorf("c.Indexes().CreateOne %s %s", collection, field)
+			return fmt.Errorf("c.Indexes().CreateOne %s %s uniq: %v sparce: %v", index.Collection, index.Field, index.Unique, index.Sparce)
 		}
 	}
 
