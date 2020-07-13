@@ -180,9 +180,22 @@ func (db *DB) CreateIndices(indexes []Index) error {
 		c := db.Database(db.name).Collection(index.Collection)
 
 		if _, err := c.Indexes().CreateOne(context.Background(), mod); err != nil {
-			return fmt.Errorf("c.Indexes().CreateOne %s %s uniq: %v sparce: %v", index.Collection, index.Field, index.Unique, index.Sparse)
+			return fmt.Errorf("c.Indexes().CreateOne %s %s uniq: %v sparce: %v %v", index.Collection, index.Field, index.Unique, index.Sparse, err)
 		}
 	}
 
 	return nil
+}
+
+// DropIndexes -
+func (db *DB) DropIndexes(collection string) error {
+	ctx := context.Background()
+	_, err := db.Database(db.name).Collection(collection).Indexes().DropAll(ctx)
+	return err
+}
+
+// GetCollectionNames -
+func (db *DB) GetCollectionNames() ([]string, error) {
+	ctx := context.Background()
+	return db.Database(db.name).ListCollectionNames(ctx, bson.D{})
 }
