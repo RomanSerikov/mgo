@@ -157,16 +157,16 @@ func (db *DB) BulkWrite(collection string, data []mongo.WriteModel, stopAfterFai
 }
 
 // CreateIndex for collection
-func (db *DB) CreateIndex(collection, field string) error {
-	return db.CreateIndices(map[string]string{collection: field})
+func (db *DB) CreateIndex(collection, field string, unique bool) error {
+	return db.CreateIndices(map[string]string{collection: field}, unique)
 }
 
 // CreateIndices for collections
-func (db *DB) CreateIndices(indexes map[string]string) error {
+func (db *DB) CreateIndices(indexes map[string]string, unique bool) error {
 	for collection, field := range indexes {
 		mod := mongo.IndexModel{
 			Keys:    bson.M{field: 1},
-			Options: options.Index().SetUnique(true),
+			Options: options.Index().SetUnique(unique),
 		}
 
 		c := db.Database(db.name).Collection(collection)
