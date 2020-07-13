@@ -22,7 +22,7 @@ type Index struct {
 	Collection string
 	Field      string
 	Unique     bool
-	Sparce     bool
+	Sparse     bool
 }
 
 // NewDatabase creates DB struct with URI and database name
@@ -174,13 +174,13 @@ func (db *DB) CreateIndices(indexes []Index) error {
 	for _, index := range indexes {
 		mod := mongo.IndexModel{
 			Keys:    bson.M{index.Field: 1},
-			Options: options.Index().SetUnique(index.Unique).SetSparse(index.Sparce),
+			Options: options.Index().SetUnique(index.Unique).SetSparse(index.Sparse),
 		}
 
 		c := db.Database(db.name).Collection(index.Collection)
 
 		if _, err := c.Indexes().CreateOne(context.Background(), mod); err != nil {
-			return fmt.Errorf("c.Indexes().CreateOne %s %s uniq: %v sparce: %v", index.Collection, index.Field, index.Unique, index.Sparce)
+			return fmt.Errorf("c.Indexes().CreateOne %s %s uniq: %v sparce: %v", index.Collection, index.Field, index.Unique, index.Sparse)
 		}
 	}
 
