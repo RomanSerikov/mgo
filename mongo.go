@@ -93,11 +93,10 @@ func (db *DB) UpdateItem(collection string, filter bson.D, item interface{}) err
 }
 
 // UpdateItems in collection
-func (db *DB) UpdateItems(collection string, filter bson.D, item interface{}) error {
+func (db *DB) UpdateItems(collection string, filter bson.D, item interface{}) (*mongo.UpdateResult, error) {
 	ctx := context.Background()
 	c := db.Database(db.name).Collection(collection)
-	_, err := c.UpdateMany(ctx, filter, item)
-	return err
+	return c.UpdateMany(ctx, filter, item)
 }
 
 // UpsertItem in collection. Create if not exist, update otherwise
